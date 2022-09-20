@@ -1,0 +1,399 @@
+CRUD-C- CREATE TABLE books(id NOT NULL AUTO_INCREMENT, title VARCHAR(100), author VARCHAR(100), quantity INT, PRIMARY KEY(id));
+INSERT INTO books(title,author, quantity) VALUES ('Lord of the rings', 'Someone I should know', 55);
+
+CRUD-R- SELECT * FROM books; SELECT title, quantity FROM books;
+
+CRUD-U- UPDATE <table_name> SET quantity=11 WHERE title="Lord of the rings";
+
+CRUD-D- DELETE FROM <table_name> WHERE <condition>
+
+---------------------------------------
+
+CONCAT- combine (EXP: SELECT CONCAT (book, ' ', author) FROM books;
+
+CONCAT_WS- combine with seperator (EXP: SELECT CONCAT_WS(' - ', book, author) FROM books;
+
+reading source files: sql-ctl cli --> use <database>---> source <fileName.sql>; 
+
+SUBSTRING/ SUBSTR()- choosing a part of the string/ SELECT SUBSTRING('Hello World, 1, 4)-from letter 1 to 4 / SELECT SUBSTRING('Hello world', 7)- from letter 7 to the end// SELECT SUBSTRING('Hello world', -3) - starts counting backwards- returns rld// SELECT SUBSTRING(title, 1, 10) AS 'short title' FROM books;
+
+REPLACE - replaces parts of the strings - SELECT REPLACE('Hello World', "Hell", '%$#@'); SELECT REPLACE('Hello World', 'l', 7);
+
+REVERSE - reverses strings // SELECT REVERSE('Hello World');
+
+CHAR_LENGTH - counts character length // SELECT CHAR_LENGTH('Hello World');// SELECT author_lname, CHAR_LENGTH(author_lname) AS 'length' from books; // SELECT CONCAT(author_lname, ' is ', CHAR_LENGTH(author_lname), ' characters long') AS 'how many characters in last name of authors' from books;
+
+UPPER AND LOWER- changes a string to uppercase or lowercase letters. SELECT UPPER('Hello World'); // SELECT CONCAT('MY FACORITE BOOK IS THE ', UPPER(title)) FROM books;
+
+--------------------------------------
+
+DISTINCT - gives distinct/unique parameters - SELECT DISTINCT author_lname FROM books;
+
+ORDER BY -  sorting our results SELECT author_lname FROM books ORDER BY author_lname; // SELECT title, author_fname, author_lname FROM books ORDER BY 2 (2 means 2 parameter, so in this case author_fname)//
+
+LIMIT - SPECIFY a number for how many results we want // SELECT title FROM books LIMIT 3;// SELECT title, released_year FROm books ORDER BY released_year DESC LIMIT 5//
+
+LIKE- Better searching // SELECT * FROM books WHERE author_fname LIKE '%da%'(i want a name that has a da inside of it)// %- means where word does begin or end. // SELECT * FROM books WHERE stock_quantity LIKE '____'; (4 underscores- it's looking for 4 numbers)
+
+-------------------------------------------
+
+COUNT - does what it tells // SELECT COUNT(*) FROM books; // SELECT COUNT(DISTINCT author_fname) FROM books; // SELECT COUNT(title) FROM books WHERE title LIKE '%the%'
+
+GROUP BY - summarizes or aggregates identical data into single rows // SELECT author_lname, COUNT(*) FROM books GROUP BY author_lname (it counts how many entries are under authors after grouping books under the authors).
+SELECT title, author_fname, author_lname, COUNT(*) FROM books GROUP BY author_lname, author_fname; // SELECT CONCAT('In ', released_year, ' ', COUNT(*), ' book(s) released') FROM books GROUP BY released_year;
+
+MIN and MAX - self explanatory // SELECT MIN(released_year) FROM books; // SELECT * FROM books WHERE  pages=(SELECT MAX(pages) FROM books); //alternative- SELECT title, pages FROM books ORDER BY pages DESC LIMIT 1;
+
+MIN/MAX with GROUP BY - SELECT author_fname, author_lname, MIN(released_year) FROM books GROUP BY author_lname, author_fname; // SELECT CONCAT( author_fname, ' ', author_lname) AS author, MAX(pages) AS 'Longest book' FROM books GROUP BY author_lname, author_fname;
+
+SUM - Add things together - SELECT SUM(pages) FROM books;
+
+SUM with GROUP BY // SELECT author_fname, author_lname, SUM(pages) FROM books GROUP BY author_lname, author_fname;
+
+AVG - average // SELECT author_fname, author_lname, AVG(pages) FROM books GROUP BY author_lname, author_fname;
+
+-----------------------------------------
+
+CHAR - CHAR has a fixed length compared to VARCHAR// CHAR is faster for fixed length text// IT WILL ALWAYS STORE THE LENGTH.
+
+DECIMAL - DECIMAL(5,2) -5 digits long, 2 decimal digits (255.99 for example)
+
+FLOAT(precise ~7 digits) and DOUBLE(is bigger than float, precise ~15 digits) -  stores larger numbers using less space , but it comes at the cost of precision // CREATE TABLE thingies(price FLOAT);
+
+DATE - values with a date but no time ('YYYY-MM-DD')
+
+TIME - values with a time but no DATE ('HH:MM:SS')
+
+DATETIME - values with time and date  /// 
+CREATE TABLE people (
+    -> name VARCHAR(100),
+    -> birthdate DATE,
+    -> birthtime TIME,
+    -> birthdt DATETIME
+    -> );
+INSERT into people (name, birthdate, birthtime, birthdt) VALUES ('Larry', '1943-12-25', '04:10:42', '1943-12-25 04:10:42');
+
+
+CURDATE() - current DATE()
+CURTIME() - CURRENT TIME()
+NOW() - CURRENT DATE AND TIME!
+
+FORMATTING DATA:
+DAY()
+DAYNAME()
+DAYOFWEEK()
+DAYOFYEAR() --- SELECT name, birthdate,  DAYOFYEAR(birthdate) FROm people;
+
+MONTH()
+MONTHNAME()
+HOUR()
+MINUTE()
+
+DATE_FORMAT - // SELECT DATE_FORMAT('2009-10-04 22:23:00', '%W %M %Y'); // SELECT DATE_FORMAT(birthdt, 'Was Born On a %W') FROM people; // SELECT DATE_FORMAT(birthdt, '%m/%d/%Y') FROM people;
+SELECT DATE_FORMAT(NOW(), '%M %D at %h:%i');
+
+DATE MATH:
+DATEDIFF - SELECT name, birthdate, DATEDIFF(NOW(), birthdate) FROM people;
+DATE_ADD() - SELECT birthdt, DATE_ADD(birthdt, INTERVAL 1 MONTH) FROM people;
+
+TIMESTAMPS:
+CREATE TABLE comments (
+    -> content VARCHAR(100),
+    -> created_at TIMESTAMP DEFAULT NOW()
+    -> );
+
+CREATE TABLE comments2 ( content VARCHAR(100), created_at TIMESTAMP DEFAULT NOW() ON UPDATE CURRENT_TIMESTAMP );
+UPDATE comments2 SET content="THIS IS NOT GIBBERISH" where content='I found this offensive';
+
+------------------------------
+
+LOGICAL OPERATORS:
+
+NOT EQUAL - SELECT title, year FROM books WHERE released_year != 2017;
+
+NOT LIKE - SELECT title FROM books WHERE title NOT LIKE '%W%';
+
+GREATER THAN - SELECT * FROM books WHERE released_year > 2000; >= -> greater or equal
+
+LESS THAN - <
+
+&&  (LOGICAL AND) - SELECT title, author_lname, released_year FROM books WHERE author_lname= "Eggers" && released_year>2010; SELECT * FROM books WHERE author_lname = "eggers" AND released_year > 2010 AND title LIKE '%novel%';
+
+OR || - SELECT title, author_lname, released_year, stock_quantity FROM books WHERE author_lname = "eggers" || Released_year >2010 OR stock quantity >100;
+
+BETWEEN - SELECT title, released_year FROM books WHERE released_year > 2004 AND released_year <=2015; // SELECT title,released_year FROM books WHERE released_year BETWEEN 2004 AND 2015;
+
+NOT BETWEEN - same as between only the opposite effect
+
+In AND Not In - SELECT title, author_lname FROM books WHERE author_lname IN ('Carver', "Lahiri', 'Smith');
+
+% - test if something is even - SELECT title, released_year FROM books WHERE released_year >= 2000 AND released_year % 2 != 0 ;
+
+CASE STATEMENTS - SELECT title, released_year, CASE WHEN released_year >= 2000 THEN 'Modern Lit' ELSE '20th Century Lit' END AS GENRE FROM books; // SELECT title, stock_quantity,  CASE WHEN stock_quantity BETWEEN 0 AND 50 THEN '*' WHEN stock_quantity BETWEEN 51 AND 100 THEN '**' ELSE '***' END AS STOCK FROM books; // SELECT title, stock_quantity,  CASE WHEN stock_quantity <=50 THEN '*' WHEN stock_quantity <= 100 THEN '**' ELSE '***' END AS STOCK FROM books;
+                  SELECT title, author_lname FROM books WHERE SUBSTR(author_lname,1,1) IN ('C', 'S'); /// SELECT title, author_lname, CASE WHEN title LIKE '%stories%' THEN 'Short stories' WHEN title LIKE 'Just Kids' || title LIKE '%A Heartbreaking Work%' THEN "Memoir" ELSE "Novel" END AS "TYPE" FROM
+
+------------------------------
+
+RELATIONSHIP BASICS:
+
+1.MANY: -
+CREATE TABLE orders( id INT AUTO_INCREMENT PRIMARY KEY, order_date DATE, amount DECIMAL(8,2), customer_id INT, FOREIGN KEY(customer_id) REFERENCES customers(id));
+
+CROSS Join - SELECT * FROM customers, orders; (not really useful)//
+
+INNER JOIN - SELECT * FROM customers, orders WHERE customers.id = customer_id; // SELECT * FROM customers JOIN orders ON  customers.id = orders.customer_id;
+             SELECT first_name, last_name, order_date, SUM(amount) AS total_spent FROM customers JOIN orders ON customers.id = orders.customer_id GROUP BY orders.customer_id ORDER BY total_spent;
+
+LEFT JOIN - SELECT * FROM customers LEFT JOIN orders ON customers.id = orders.customer_id;
+
+IFNULL - SELECT first_name, last_name, IFNULL(SUM(amount), 0) AS total_spent FROM customers LEFT JOIN orders ON customers.id = orders.customer_id GROUP BY customers.id ORDER BY total_spent DESC;
+
+RIGHT JOIN - SELECT IFNULL(first_name, 'MISSING') AS first, IFNULL(last_name, 'USER'), order_date, amount, SUM(amount) FROM customers RIGHT JOIN orders ON Customers.id = orders.customer_id GROUP BY first_name, last_name;
+
+DELETE CASCADE - DELETE FROM customers WHERE email ="gm@gmail.com";
+
+SELECT first_name, title, grade FROM students INNER JOIN papers ON students.id = papers.student_id ORDER BY grade DESC;
+SELECT first_name, title, grade FROM studentsLEFT JOIN papers ON students.id = papers.student_id ;
+SELECT first_name, IFNULL(title, "MISSING"), IFNULL(grade, 0) FROM students LEFT JOIN papers ON students.id = papers.student_id;
+SELECT first_name, IFNULL(AVG(grade), 0) AS average FROM students LEFT JOIN papers ON students.id = papers.student_id GROUP BY students.id ORDER BY average DESC;
+SELECT first_name, IFNULL(AVG(grade), 0) AS average, CASE WHEN AVG(grade) IS NULL THEN 'FAILING' WHEN AVG(grade) >= 75 THEN 'PASSING' ELSE 'FAILING' END as passing_status FROM students LEFT JOIN papers ON students.id = papers.student_id GROUP BY students.id ORDER BY average DESC;
+
+MANY:MANY:
+
+# CREATE TABLE reviews (
+#     id INT AUTO_INCREMENT PRIMARY KEY,
+#     rating DECIMAL(2,1),
+#     series_id INT,
+#     reviewer_id INT,
+#     FOREIGN KEY(series_id) REFERENCES series(id),
+#     FOREIGN KEY(reviewer_id) REFERENCES reviewers(id)
+# )
+
+SELECT title, rating FROM series JOIN reviews ON series.id= reviews.series_id;
+SELECT title, AVG(rating) AS avg_rating FROM series JOIN reviews ON series.id =reviews.series_id GROUP BY series.id ORDER BY avg_rating;
+SELECT first_name, last_name, rating FROM reviewers JOIN reviews ON reviewers.id = reviews.reviewer_id;
+SELECT title AS unreviewed_series FROM series LEFT JOIN reviews ON series.id = reviews.series_id WHERE rating is NULL;
+SELECT genre, ROUND(AVG(rating),2) AS avg_rating FROM series INNER JOIN reviews ON series.id = reviews.series_id GROUP BY genre;
+
+SELECT 
+	first_name,
+    last_name,
+    COUNT(rating) AS COUNT,
+    IFNULL(MIN(rating), 0) AS MIN,
+    IFNULL(MAX(rating), 0) AS MAX,
+    ROUND(IFNULL(AVG(rating), 0), 2) AS AVG,
+    CASE
+    	WHEN COUNT(rating) >= 1 THEN 'ACTIVE'
+        ELSE 'INACTIVE'
+    END AS STATUS
+    FROM reviewers LEFT JOIN reviews
+    	ON reviewers.id = reviews.reviewer_id
+        GROUP BY reviewers.id;
+
+SELECT title,
+	rating,
+	CONCAT(first_name, ' ', last_name) AS reviewer FROM reviewers
+INNER JOIN reviews
+	ON reviewers.id = reviews.reviewer_id
+INNER JOIN series
+	ON series.id = reviews.series_id
+    ORDER BY title;
+
+-----------------------------------------
+
+INSTAGRAM CLONE:
+
+CREATE DATABASE db_instagram
+USE db_insagram
+
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(255) UNIQUE NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW()
+)
+
+INSERT INTO users (username) VALUES ('BlueTheCat'), ('CharlieBrown'), ('ColdSteele');
+
+CREATE TABLE photos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    image_url VARCHAR(255) NOT NULL,
+    user_id INT NOT NULL,
+    FOREIGN KEY(user_id) REFERENCES users(id),
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+INSERT INTO photos (image_url, user_id) VALUES('/alskjd76', 1), ('/alskjd76', 2), ('/alskjd76', 2);
+
+SELECT photos.image_url, users.username FROM photos INNER JOIN users ON photos.user_id = users.id;
+
+CREATE TABLE comments (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    comment_text VARCHAR(255) NOT NULL,
+    user_id INT NOT NULL,
+    photo_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW(),
+    FOREIGN KEY(user_id) REFERENCES users(id),
+    FOREIGN KEY(photo_id) REFERENCES photos(id)
+);
+
+INSERT INTO comments (comment_text, user_id, photo_id) VALUES ('Meow!', 1, 2), ('Amazing shot!', 3, 2), ('I <3 This', 2, 1);
+
+CREATE TABLE likes (
+    user_id INT NOT NULL,
+    photo_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW(),
+    FOREIGN KEY(user_id) REFERENCES users(id),
+    FOREIGN KEY(photo_id) REFERENCES photos(id),
+    PRIMARY KEY(user_id, photo_id)
+);
+
+INSERT INTO likes (user_id, photo_id) VALUES (1,1), (2,1), (1,2), (1,3), (3,3);
+
+CREATE TABLE follows (
+    follower_id INT NOT NULL,
+    followee_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW(),
+    FOREIGN KEY(follower_id) REFERENCES users(id),
+    FOREIGN KEY(followee_id) REFERENCES users(id),
+    PRIMARY KEY(follower_id, followee_id)
+);
+
+INSERT INTO follows (follower_id, followee_id) VALUES(1,2), (1,3), (3,1), (2,3);
+
+CREATE TABLE tags (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    tag_name VARCHAR(255) UNIQUE,
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+
+
+CREATE TABLE photo_tags (
+    photo_id INT NOT NULL,
+    tag_id INT NOT NULL,
+    FOREIGN KEY(photo_id) REFERENCES photos(id),
+    FOREIGN KEY(tag_id) REFERENCES tags(id),
+    PRIMARY KEY(photo_id, tag_id)
+);
+
+INSERT INTO tags(tag_name) VALUES ('adorable'), ('cute'), ('sunrise');
+
+INSERT INTO photo_tags (photo_id, tag_id) VALUES (1,1), (1,2), (2,3), (3,2);
+
+---------
+
+WORKING WITH INSTAGRAM CLONE: (COURSE CONTENT :258)
+
+SELECT DAYNAME(created_at) AS day, COUNT(*) AS total FROM users GROUP BY day ORDER BY total DESC LIMIT 2;
+
+SELECT username, image_url FROM users LEFT JOIN photos ON users.id = photos.user_id WHERE photos.id IS NULL;
+
+SELECT username, photos.id, photos.image_url, COUNT(*) AS total FROM photos INNER JOIN likes ON likes.photo_id = photos.id INNER JOIN users ON photos.user_id = users.id GROUP BY photos.id ORDER BY total DESC LIMIT 1;
+
+SELECT (SELECT COUNT(*) FROM photos) / (SELECT COUNT(*) FROM users) AS avg;
+
+SELECT tags.tag_name, COUNT(*) AS total FROM photo_tags JOIN tags ON photo_tags.tag_id = tags.id GROUP BY tags.id ORDER BY total DESC LIMIT 5;
+
+SELECT username, COUNT(*) AS num_likes FROM users INNER JOIN likes ON users.id = likes.user_id GROUP BY likes.user_id HAVING num_likes = (SELECT COUNT(*) FROM photos);
+
+----------------------------------
+
+-- SELECT email, created_at AS earliest_date FROM users ORDER BY created_at LIMIT 1;
+
+-- SELECT MONTHNAME(created_at) as month, COUNT(*) AS count FROM users GROUP BY month ORDER BY count DESC; 
+
+-- SELECT COUNT(*) AS yahoo_users FROM users WHERE email LIKE '%@yahoo%';
+
+-- SELECT DATE_FORMAT(MIN(created_at), "%M %D %Y") as earliest_date FROM users;
+
+SELECT 
+	CASE
+		WHEN email LIKE '%@yahoo%' THEN 'yahoo'
+        WHEN email LIKE '%gmail%' THEN 'gmail'
+        WHEN email LIKE '%hotmail%' THEN 'hotmail'
+        ELSE 'other'
+    END AS provider,
+    COUNT(*) AS total_users
+FROM users
+GROUP BY provider
+ORDER BY total_users DESC;
+
+
+--------------------
+
+TRIGGERS:
+
+DELIMITER $$
+
+CREATE TRIGGER must_be_adult
+     BEFORE INSERT ON users FOR EACH ROW
+     BEGIN
+          IF NEW.age < 18
+          THEN
+              SIGNAL SQLSTATE '45000'
+                    SET MESSAGE_TEXT = 'Must be an adult!';
+          END IF;
+     END;
+$$
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+CREATE TRIGGER capture_unfollow
+     AFTER DELETE ON follows FOR EACH ROW
+     BEGIN
+     INSERT INTO unfollows(follower_id,followee_id)
+     VALUES (OLD.follower_id, OLD.followee_id);
+     END;
+$$
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+CREATE TRIGGER create_unfollow
+    AFTER DELETE ON follows FOR EACH ROW 
+BEGIN
+    INSERT INTO unfollows
+    SET follower_id = OLD.follower_id,
+        followee_id = OLD.followee_id;
+END$$
+
+DELIMITER ;
+
+------------------
+
+https://www.educba.com/data-science/data-science-tutorials/mysql-tutorial/
+
+https://www.w3resource.com/mysql/mysql-tutorials.php
+
+https://www.geeksforgeeks.org/sql-tutorial/?ref=gcse
+
+https://www.mysqltutorial.org/
+
+https://www.w3schools.com/sql/
+
+https://www.geeksengine.com/database/sample/
+
+https://www.khanacademy.org/computing/computer-programming/sql/
+
+More advanced SQL
+
+https://www.hackerrank.com/domains/sql
+
+https://leetcode.com/study-plan/sql/
+
+https://www.tutorialspoint.com/mysql/index.htm
+
+https://sqlzoo.net/wiki/SQL_Tutorial
+
+YouTube Creators (advanced)
+
+https://www.youtube.com/c/techTFQ
+
+https://www.youtube.com/c/LearnatKnowstar
+
+https://www.youtube.com/channel/UCfGTc8zyBjCGg-Ilc4oAxEg/videos
